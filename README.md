@@ -2,8 +2,6 @@
 ## This is an open-source project developed by four [Uvic](https://www.uvic.ca/) students for educational purposes.
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-
-
 [![Linux](https://svgshare.com/i/Zhy.svg)](https://www.linux.org/)
 
 ![workflow](https://github.com/RoyLQ/Advanced_IDE_Recommendation/blob/roy/SENG480B.png)
