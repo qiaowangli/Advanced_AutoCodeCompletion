@@ -1,13 +1,10 @@
 # Advanced_IDE_Recommendation
 ## This is an open-source project developed by four [Uvic](https://www.uvic.ca/) students for educational purposes.
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
 [![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg)](https://www.python.org/)
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 [![Linux](https://svgshare.com/i/Zhy.svg)](https://www.linux.org/)
-
-[![GitLab last commit](https://badgen.net/gitlab/last-commit/NickBusey/HomelabOS/)](https://github.com/RoyLQ/Advanced_IDE_Recommendation/commit/master)
-
 
 ![workflow](https://github.com/RoyLQ/Advanced_IDE_Recommendation/blob/roy/SENG480B.png)
 
