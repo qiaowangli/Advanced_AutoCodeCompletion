@@ -1,4 +1,4 @@
-# Advanced_IDE_Recommendation
+# Advanced_AutoCodeCompletion
 ## This is an open-source project developed by [Uvic](https://www.uvic.ca/) CSC students for educational purposes.
 [![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
