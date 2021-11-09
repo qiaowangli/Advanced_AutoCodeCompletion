@@ -5,8 +5,8 @@ import traversal as tr
 import sys
 
 """
-Last edited by   : Shawn
-Last edited time : 08/11/2021
+Last edited by   : Braiden
+Last edited time : 09/11/2021
 Version Status: stable
 TO DO: Verify correctness
 """
@@ -19,3 +19,5 @@ if __name__ == "__main__":
     print(in_order_list)
     reverse_preorder = tr.reverse_preorder(root)
     print(reverse_preorder)
+
+    all_root_to_leaf_paths = tr.get_all_paths(root)
