@@ -91,10 +91,10 @@ def sequenceSplit(in_order_list,lookup_table):
     trainning_dataset_index=0
     list=[]
     for index in in_order_list:
-        if(lookup_table[index].value is None):
-            list.append(lookup_table[index].type)
-        else:
+        if(lookup_table[index].child is None):
             list.append(lookup_table[index].value)
+        else:
+            list.append(lookup_table[index].type)
 
         if(lookup_table[index].next != None):
             # we need to get the parent nodes starting from the end of "in_order_list"
