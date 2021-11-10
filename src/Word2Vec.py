@@ -1,8 +1,8 @@
 #!/usr/bin/python3
 
 """
-Last edited by   : Roy
-Last edited time : 08/11/2021
+Last edited by   : Shawn
+Last edited time : 09/11/2021
 Version Status: dev
 TO DO: Verify correctness
 """
@@ -136,31 +136,25 @@ def tokenization(sub_sequence_dict):
     frequency = 1
     # Creating the lookup table for the provided sub_sequence_dict
     for sequence in sub_sequence_dict:
+        temp_list = []
         for val in sub_sequence_dict[sequence]:
             # Check if the value is already within the dictionary
             if val not in lookup_table_a.values():
                 lookup_table_a[token_index] = val
                 token_index += 1
-            # else:  # value is in the lookup
+
+            new_val = get_key(val, lookup_table_a)
+            temp_list.append(new_val)
 
             lookup_table_b[val] = frequency
             frequency += 1
+
+        tokenized_subsequence.append(temp_list)
 
     # Now I need to make my final dict which contains the mapping of {value: [word, frequency]}
     for index in lookup_table_a:
         x = lookup_table_a[index]  # lookup table for val
         y = lookup_table_b[x]  # lookup
         lookup_table_dict[index] = [x, y]
-
-    for sequence in sub_sequence_dict:
-        temp_list = []
-        # Sequence here is the ID associated to the sequence
-        for val in sub_sequence_dict[sequence]:
-            # Val here is the actual value within each sequence
-            # I need to get the new value associated to Val in my lookup table
-            new_val = get_key(val, lookup_table_a)
-            temp_list.append(new_val)
-
-        tokenized_subsequence.append(temp_list)
 
     return tokenized_subsequence, lookup_table_dict
