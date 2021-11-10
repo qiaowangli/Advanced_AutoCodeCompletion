@@ -18,5 +18,5 @@ if __name__ == "__main__":
     subSequence_list = w2v.sequenceSplit(in_order_list, lookup_table)
 
     tokenized_subSequence, tokenized_lookup_table = w2v.tokenization(subSequence_list)
-    print(tokenized_lookup_table[1])
+    print(len(tokenized_lookup_table))
     # print(tokenized_subSequence)

@@ -15,5 +15,11 @@ def storage_connection(tokenized_subsequence, lookup_table_dict):
                 and lookup_table_dict --> {1, [R = 'Program, F = 12],...}
     @ output: word embedding table
     """
-    pass
+    window_size = 2
+    positive_skip_grams, _ = tf.keras.preprocessing.sequence.skipgrams(
+        tokenized_subsequence[0],
+        vocabulary_size=len(lookup_table_dict),
+        window_size=window_size,
+        negative_samples=0)
+    print(len(positive_skip_grams))
 
