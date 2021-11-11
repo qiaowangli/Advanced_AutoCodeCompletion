@@ -10,7 +10,7 @@ TO DO: allow users to change the bucket and object # line 28
 """
 
 
-def storage_connection(credential_path):
+def storage_connection(credential_path,objectName = "example.json"):
     """
     @ input : your credential_path
     @ output: python dictionary with all ASTs
@@ -24,7 +24,7 @@ def storage_connection(credential_path):
         secret_key=login['console'][0]['secret_key'].replace(u'\xa0', u''),
     )
 
-    test_obj = client.get_object("RawDataStorage", "example.json")
+    test_obj = client.get_object("RawDataStorage", objectName)
     training_list = {}
     ast_index = 0
 
