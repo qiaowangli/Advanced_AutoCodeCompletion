@@ -19,6 +19,11 @@ def getVector(model,sentence = "summary CallExpression ExpressionStatement Block
     return output
 
 def main():
+    '''
+    the data is a list of sequences
+    a sequnce is a list of words (node name)
+    right now it's loading from a saved datastructre, it would be parsed in in the future
+    '''
     data = pickle.load(open("data.p","rb"))
     model = trainModel(data)
     vector = getVector(model,"summary CallExpression ExpressionStatement BlockStatement FunctionDeclaration Program")
