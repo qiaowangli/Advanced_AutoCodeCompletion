@@ -2,7 +2,6 @@ from tokenizers import BertWordPieceTokenizer
 from tokenizers.processors import BertProcessing
 
 import numpy as np
-import pickle
 import os
 
 def makeSenteces(rawInput):
