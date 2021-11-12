@@ -5,23 +5,27 @@ import numpy as np
 import pickle
 import os
 
-def mainSenteces(rawInput):
-    with open("Sentences","w") as f:
+def makeSenteces(rawInput):
+    with open("Sentences.txt","w") as f:
         for l in rawInput:
             f.write(' '.join(l) + '\n')
 
-def trainTokenazer():
+def traintokenizer():
     tokenizer = BertWordPieceTokenizer(handle_chinese_chars=False,
                                 strip_accents=False,
                                 lowercase=False)
     tokenizer.train(files=["Sentences.txt"])
-    tokenizer.enable_truncation(max_length=512)
     os.system("mkdir CodeTokenizer")
     tokenizer.save_model("./CodeTokenizer")
+    return tokenizer
+
+def compileTokenizer(rawInput):
+    makeSenteces(rawInput)
+    tokenizer = traintokenizer()
+    return tokenizer
 
 def main():
-    trainTokenazer()
-
+    compileTokenizer()
 
 if __name__ == '__main__':
     main()

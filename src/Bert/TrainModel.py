@@ -67,10 +67,8 @@ def MakeMLMMasking(inputs,maskingRate = 0.15):
         inputs.input_ids[i,selection] = 5
     return inputs
 
-def main():
-    MAX_LEN = 15
+def compileModel(data,MAX_LEN = 15,maskingRate = 0.15):
     #data is the list sequences (while seq is a list of words)
-    data = pickle.load(open("data.p","rb"))
     firstHalf,secondHalf,labels = MakeNSPinput(data)
 
     tokenizer = BertTokenizer.from_pretrained('./CodeTokenizer')
@@ -79,10 +77,8 @@ def main():
     inputs["next_sentence_label"] = labels
     inputs["labels"] = inputs.input_ids.detach().clone()
 
-    inputs = MakeMLMMasking(inputs)
+    inputs = MakeMLMMasking(inputs,maskingRate)
     dataset = CodeDataSet(inputs)
-    print (dataset[3])
-    exit(0)
 
     loader = torch.utils.data.DataLoader(dataset, batch_size=16, shuffle=True)
     #device = torch.device("cuba") if torch.cuba.is_available() else torch.device("cpu")
@@ -113,6 +109,7 @@ def main():
 
             loop.set_description(f'Epoch {epoch}')
             loop.set_postfix(loss=loss.item)
+    return model
 
 if __name__ == '__main__':
     main()
