@@ -1,0 +1,6 @@
+ai-02-00001-v3.pdf:https://arxiv.org/abs/2009.07740
+
+automatic_code_completion_Stanford.pdf: NONE
+
+
+Code Completion with Recurrent Neural Networks: https://research.infosupport.com/wp-content/uploads/Code-Completion-with-Recurrent-Neural-Networks-Thesis-Erik-van-Scharrenburg.pdf
