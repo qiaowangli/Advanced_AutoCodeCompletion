@@ -8,13 +8,13 @@ from csv import reader
 """
 Last edited by   : Roy
 Last edited time : 13/11/2021
-Version Status: stable
+Version Status: dev
 TO DO: NONE
 """
 def csv_convert(file_path,row_zie,col_size,pca_variance=0.9):
     """
-    @ input : file_path,row_zie,col_size
-    @ output: numpy dataframe
+    @ input : file_path,row_zie,col_size,pca_variance
+    @ output: reducted numpy dataframe
     """
     dataframe=np.zeros((row_zie,col_size))
     with open('/Users/royli/Desktop/vector.csv', 'r') as read_obj:
