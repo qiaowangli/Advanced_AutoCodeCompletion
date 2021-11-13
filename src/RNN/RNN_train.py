@@ -5,7 +5,7 @@ import RNN_input as rnn_in
 """
 Last edited by   : Roy
 Last edited time : 13/11/2021
-Version Status: stable
+Version Status: dev
 TO DO: 1. look_up_table , the purpose of (file_path,row_zie,col_size) is to convert the data from vector.csv to numpy dataframe, then we need a look up table to know what each row is.
 """
 def csv_convert(file_path,row_zie,col_size,sequence_list,look_up_table,pca_variance):
