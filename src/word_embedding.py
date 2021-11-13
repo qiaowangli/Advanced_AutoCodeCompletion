@@ -1,3 +1,4 @@
+%%writefile word_embedding.py
 #!/usr/bin/python3
 import numpy as np
 import tensorflow as tf
@@ -88,19 +89,19 @@ def word_embedding(tokenized_subsequence, lookup_table_dict):
                 and lookup_table_dict --> {1, [R = 'Program, F = 12],...}
     @ output: word embedding table
     """
-    targets, contexts, labels=generate_training_data(tokenized_subsequence,2,2,len(tokenized_subsequence))
+    targets, contexts, labels=generate_training_data(tokenized_subsequence,2,10,len(lookup_table_dict))
     AUTOTUNE = tf.data.AUTOTUNE
     targets = np.array(targets)
     contexts = np.array(contexts)[:,:,0]
     labels = np.array(labels)
     BATCH_SIZE = 1024
-    BUFFER_SIZE = 10000
+    BUFFER_SIZE = 20000
     dataset = tf.data.Dataset.from_tensor_slices(((targets, contexts), labels))
     dataset = dataset.shuffle(BUFFER_SIZE).batch(BATCH_SIZE, drop_remainder=True)
     # acclerating the processing speed 
     dataset = dataset.cache().prefetch(buffer_size=AUTOTUNE)
     # constructing embedding table 
-    embedding_dim = 300
+    embedding_dim = 100
     # the size of embedding table would be len(lookup_table_dict) * embedding_dim
     word2vec = Word2Vec(len(lookup_table_dict), embedding_dim,10)
     word2vec.compile(optimizer='adam',
@@ -108,12 +109,6 @@ def word_embedding(tokenized_subsequence, lookup_table_dict):
                  metrics=['accuracy'])
     tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir="logs")
     # fitting model
-    word2vec.fit(dataset, epochs=20, callbacks=[tensorboard_callback])
+    word2vec.fit(dataset, epochs=5, callbacks=[tensorboard_callback])
     # output embedding table
     return word2vec.get_layer('w2v_embedding').get_weights()[0]
-
-
-
-
-    
-
