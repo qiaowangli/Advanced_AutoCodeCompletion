@@ -61,6 +61,7 @@ def main():
     dataset = CodeDataset(input, mask)
 
     model = makeModel(tokenizer)
+    eval_model(model,tokenizer)
 
     training_args = TrainingArguments(
         output_dir="./bert",

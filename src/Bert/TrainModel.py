@@ -6,6 +6,7 @@ from tqdm import tqdm
 
 import random
 import torch
+import pickle
 
 #Reference = https://towardsdatascience.com/how-to-train-bert-aaad00533168
 
@@ -61,7 +62,7 @@ def MakeNSPinput(data):
 def MakeMLMMasking(inputs,maskingRate = 0.15):
     rand = torch.rand(inputs.input_ids.shape)
     #Do not mask CLS, SEP, or PAD
-    mask_arr = (rand < 0.15) * (inputs.input_ids != 3) * (inputs.input_ids != 4) * (inputs.input_ids != 0)
+    mask_arr = (rand < 0.15) * (inputs.input_ids != 2) * (inputs.input_ids != 3) * (inputs.input_ids != 0)
     for i in range(inputs.input_ids.shape[0]):
         selection = torch.flatten(mask_arr[i].nonzero()).tolist()
         #MASK id
@@ -96,7 +97,6 @@ def TrainWithData(model,loader,epochCount):
             loop.set_postfix(loss=loss.item())
     return model
 
-
 def compileModel(data,MAX_LEN = 15,maskingRate = 0.15,epochCount=3):
     #data is the list sequences (while seq is a list of words)
     firstHalf,secondHalf,labels = MakeNSPinput(data)
@@ -118,7 +118,8 @@ def compileModel(data,MAX_LEN = 15,maskingRate = 0.15,epochCount=3):
     return model
 
 def main():
-    compileModel()
+    data = pickle.load(open("data.p","rb"))
+    compileModel(data)
 
 if __name__ == '__main__':
     main()
