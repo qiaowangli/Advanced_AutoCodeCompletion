@@ -14,14 +14,6 @@ TO DO: Verify correctness
 
 if __name__ == "__main__":
     ast_data = sc.storage_connection(str(sys.argv[1]))  # call storage_connection() to get the ast
-    # root, lookup_table = w2v.ast2lcrs(ast_data[0])  # call ast2lcrs() to convert the ast to lcrs
-    # in_order_list = tr.in_order_traversal(root)  # call in_order_traversal() to get the sequence.
-    # subSequence_list = w2v.sequenceSplit(in_order_list, lookup_table)
-
-    # # tokenized_subSequence, tokenized_lookup_table = w2v.tokenization(subSequence_list)
-    # # print(tokenized_subSequence)
-    # # # embedding_table=we.word_embedding(tokenized_subSequence, tokenized_lookup_table)
-    # print(subSequence_list)
 
     seq_table={} # key: id, value: sub_seq
     seq_table_index=0
@@ -35,5 +27,4 @@ if __name__ == "__main__":
 
     tokenized_subSequence, tokenized_lookup_table = w2v.tokenization(seq_table)
     embedding_table=we.word_embedding(tokenized_subSequence, tokenized_lookup_table)
-    print(subSequence_list)
     
