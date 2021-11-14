@@ -1,7 +1,8 @@
 import TrainTokenizer
-import pickle
 import TrainModel
 import FineTuneModel
+
+import pickle
 
 import torch
 import os
@@ -69,6 +70,8 @@ def trainBertModel(data):
     pickle.dump(model,open("model.p","wb"))
     pickle.dump(tokenizer,open("tokenizer.p","wb"))
 
+    return model
+
 def main():
     '''
     the data is a list of sequences
@@ -76,7 +79,9 @@ def main():
     right now it's loading from a saved datastructre, it would be parsed in in the future
     '''
     data = pickle.load(open("data.p","rb"))
-    trainBertModel(data)
+    # for l in data:
+    #     print(l)
+    model = trainBertModel(data)
     os.system("clear")
     findFirstMask(model)
 
