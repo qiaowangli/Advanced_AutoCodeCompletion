@@ -175,16 +175,20 @@ def csv_to_df(file):
 
 
 def standardize_subsequence(tokenized_subsequence):
+    """
+    @input : tokenized sequence
+    @output: standardized tokenized sequence: Sequences that are uniform in length
+    """
     standardized_subsequence = []
     cutoff = 16  # this value was determined from analysis of our tokenized_subsequence
 
     # I need to add 0s to any sequence that is < 16 in length and cut off any sequence that is > than 16
     for sequence in tokenized_subsequence:
-        if len(sequence) == 16:
+        if len(sequence) == cutoff:
             standardized_subsequence.append(sequence)
-        if len(sequence) < 16:
+        if len(sequence) < cutoff:
             # padd 0s to make it 16 in length
-            while len(sequence) != 16:
+            while len(sequence) != cutoff:
                 sequence.append(0)
             standardized_subsequence.append(sequence)
 
