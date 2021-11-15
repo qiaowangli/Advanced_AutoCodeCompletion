@@ -192,7 +192,7 @@ def standardize_subsequence(tokenized_subsequence):
                 sequence.append(0)
             standardized_subsequence.append(sequence)
 
-    # code below was used for understanding what cutoff point to choose
+    # # code below was used for understanding what cutoff point to choose
     # dist = {}
     # for x in tokenized_subsequence:
     #     seq_len = len(x)
@@ -204,9 +204,10 @@ def standardize_subsequence(tokenized_subsequence):
     #
     # plt.bar(dist.keys(), dist.values(), 1.0, color='g')
     # plt.show()
+    #
+    # values = []
     # for sequence in tokenized_subsequence:
     #     values.append(len(sequence))
-    # values = []
     # median = statistics.median(values)
     # print(median)
 

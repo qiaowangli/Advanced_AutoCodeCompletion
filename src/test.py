@@ -13,7 +13,7 @@ TO DO: add the command for bert
 """
 
 if __name__ == "__main__":
-    ast_data = sc.storage_connection(str(sys.argv[1]))  # call storage_connection() to get the ast
+    ast_data = sc.storage_connection('/Users/shawnnettleton/Documents/credentials_shawn.json')  # call storage_connection() to get the ast
 
     seq_table = {}  # key: id, value: sub_seq
     seq_table_index = 0
