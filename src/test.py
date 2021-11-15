@@ -6,6 +6,7 @@ import Word2Vec as w2v
 import traversal as tr
 from csv import writer
 from csv import reader
+import pickle
 
 """
 Last edited by   : Shawn
@@ -29,14 +30,16 @@ if __name__ == "__main__":
 
     tokenized_subSequence, tokenized_lookup_table = w2v.tokenization(seq_table)
 
-    # print(tokenized_subSequence)
-    # for list in range(len(subSequence_list)):
-    #     print(subSequence_list[list])
-
     # This takes care of step 1 that we discussed
     # file = ''  # Need to add the filepath for the requested CSV file
     # a = w2v.csv_to_df(file)
 
     # This takes care of step 2 that we discussed
     standard_subsequence = w2v.standardize_subsequence(tokenized_subSequence)
-    print(standard_subsequence)
+
+    # Writing the input for our NN to a txt file so it can be used and avoid a 5min creation
+    output_file = open('NN_input.txt', 'w')
+    for sequence in standard_subsequence:
+        output_file.write(str(sequence))
+        output_file.write('\n')
+    output_file.close()
