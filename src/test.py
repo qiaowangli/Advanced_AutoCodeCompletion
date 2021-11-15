@@ -7,13 +7,13 @@ import sys
 
 """
 Last edited by   : Shawn
-Last edited time : 14/11/2021
+Last edited time : 15/11/2021
 Version Status: dev
 TO DO: add the command for bert
 """
 
 if __name__ == "__main__":
-    ast_data = sc.storage_connection(str(sys.argv[1]),"example.json")  # call storage_connection() to get the ast
+    ast_data = sc.storage_connection(str(sys.argv[1]), "example.json")  # call storage_connection() to get the ast
 
     seq_table = {}  # key: id, value: sub_seq
     seq_table_index = 0
