@@ -2,7 +2,7 @@
 import storage_connection as sc
 import sequence_producer as seq_produce
 import traversal as tr
-# import word_embedding as we
+import word_embedding as we
 import sys
 
 """
