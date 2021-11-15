@@ -1,4 +1,9 @@
 #!/usr/bin/python3
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import statistics
+
 
 """
 Last edited by   : Shawn
@@ -158,3 +163,48 @@ def tokenization(sub_sequence_dict):
         lookup_table_dict[index] = [x, y]
 
     return tokenized_subsequence, lookup_table_dict
+
+
+def csv_to_df(file):
+    """
+    @input : csv file
+    @output: data frame containing the csv file
+    """
+    df = pd.read_csv(file)
+    return df
+
+
+def standardize_subsequence(tokenized_subsequence):
+    standardized_subsequence = []
+    cutoff = 16  # this value was determined from analysis of our tokenized_subsequence
+
+    # I need to add 0s to any sequence that is < 16 in length and cut off any sequence that is > than 16
+    for sequence in tokenized_subsequence:
+        if len(sequence) == 16:
+            standardized_subsequence.append(sequence)
+        if len(sequence) < 16:
+            # padd 0s to make it 16 in length
+            while len(sequence) != 16:
+                sequence.append(0)
+            standardized_subsequence.append(sequence)
+
+    # code below was used for understanding what cutoff point to choose
+    # dist = {}
+    # for x in tokenized_subsequence:
+    #     seq_len = len(x)
+    #     dist[seq_len] = 0
+    #
+    # for x in tokenized_subsequence:
+    #     seq_len = len(x)
+    #     dist[seq_len] += 1
+    #
+    # plt.bar(dist.keys(), dist.values(), 1.0, color='g')
+    # plt.show()
+    # for sequence in tokenized_subsequence:
+    #     values.append(len(sequence))
+    # values = []
+    # median = statistics.median(values)
+    # print(median)
+
+    return standardized_subsequence
+
