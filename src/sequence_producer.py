@@ -184,6 +184,7 @@ def standardize_subsequence(tokenized_subsequence):
 
     # I need to add 0s to any sequence that is < 16 in length and cut off any sequence that is > than 16
     for sequence in tokenized_subsequence:
+        sequence=sequence[::-1] # reverse the list
         if len(sequence) == cutoff:
             standardized_subsequence.append(sequence)
         if len(sequence) < cutoff:
