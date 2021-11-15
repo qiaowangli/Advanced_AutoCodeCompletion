@@ -4,7 +4,7 @@ import tensorflow as tf
 from tensorflow.keras import layers
 """
 Last edited by   : Roy
-Last edited time : 10/11/2021
+Last edited time : 14/11/2021
 Version Status: stable
 TO DO: Skipgram implementaion with tf
 """
