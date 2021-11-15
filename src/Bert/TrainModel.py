@@ -21,11 +21,12 @@ class CodeDataSet(Dataset):
         val = {key: val[idx] for key, val in self.encodings.items()}
         return val
 
-def makeModel(tokenizer):
+def makeModel(hidden_size=300,num_hidden_layers=2,num_attention_heads=2,is_decoder=True,add_cross_attention=True):
     #TODO: better bert config
-    config = BertConfig(tokenizer.vocab_size, hidden_size=300,
-                        num_hidden_layers=2, num_attention_heads=2, is_decoder=True,
-                        add_cross_attention=True)
+    tokenizer = BertTokenizer.from_pretrained('./CodeTokenizer')
+    config = BertConfig(tokenizer.vocab_size, hidden_size=hidden_size,
+                        num_hidden_layers=num_hidden_layers, num_attention_heads=num_attention_heads,
+                        is_decoder=is_decoder,add_cross_attention=add_cross_attention)
     model = BertForPreTraining (config)
     return model
 
@@ -97,7 +98,7 @@ def TrainWithData(model,loader,epochCount):
             loop.set_postfix(loss=loss.item())
     return model
 
-def compileModel(data,MAX_LEN = 15,maskingRate = 0.15,epochCount=3):
+def compileModel(model,data,MAX_LEN = 512,maskingRate = 0.15,epochCount=16):
     #data is the list sequences (while seq is a list of words)
     firstHalf,secondHalf,labels = MakeNSPinput(data)
 
@@ -113,7 +114,6 @@ def compileModel(data,MAX_LEN = 15,maskingRate = 0.15,epochCount=3):
     loader = torch.utils.data.DataLoader(dataset, batch_size=16, shuffle=True)
     #device = torch.device("cuba") if torch.cuba.is_available() else torch.device("cpu")
 
-    model = makeModel(tokenizer)
     model = TrainWithData(model,loader,epochCount)
     return model
 

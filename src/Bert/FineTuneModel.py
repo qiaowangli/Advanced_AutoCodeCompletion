@@ -42,9 +42,11 @@ def maskSeq(ids,maskRate):
         maskNum = int(len(seq)*maskRate)
         for i in range(maskNum):
             index = random.randint(0,len(seq)-1)
-            while(seq[index] in [0,2,3,4]):
-                index = random.randint(0,len(seq)-1)
-            data[x][index] = 4
+            for i in range(4):
+                index = (index+i)%len(seq)
+                if(seq[index] not in [0,2,3,4]):
+                    data[x][index] = 4
+                    break
     return data
 
 # Function to calculate the accuracy of our predictions vs labels
@@ -202,7 +204,7 @@ def validaMode(model,loader,epochCount):
     print("Validation Accuracy: {}".format(eval_accuracy/nb_eval_steps))
     return model
 
-def fineTune(model,MAX_LEN=15):
+def fineTune(model,MAX_LEN=512,epochCount=16):
     with open("Sentences.txt","r") as f:
         data = f.read().split('\n')
     while '' in data:
@@ -210,8 +212,8 @@ def fineTune(model,MAX_LEN=15):
     device = torch.device("cpu")
     tokenizer = BertTokenizer.from_pretrained('./CodeTokenizer')
     train_dataloader,validation_dataloader = processDataloaders(data,tokenizer,MAX_LEN)
-    trainWithData(model,train_dataloader,3)
-    validaMode(model,validation_dataloader,3)
+    trainWithData(model,train_dataloader,epochCount)
+    validaMode(model,validation_dataloader,epochCount)
     return model
 
 def main():

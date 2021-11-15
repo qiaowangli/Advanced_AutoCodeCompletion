@@ -12,59 +12,71 @@ import torch.nn.functional as F
 from transformers import BertTokenizer
 from transformers import RobertaTokenizer, RobertaForMaskedLM, pipeline
 
-def trainModel(data):
-    TrainTokenizer.compileTokenizer(data)
-    model = TrainModel.compileModel(data)
-    return model
-
-def getVector(model,sentence = "summary CallExpression ExpressionStatement BlockStatement FunctionDeclaration Program"):
-    x = tokenizer(sentence)["input_ids"]
-    input_ids = torch.tensor(x).unsqueeze(0)
-    output = model(input_ids)
-    return output
-
-def softmax(x):
-    y = np.exp(x - np.max(x))
-    f_x = y / np.sum(np.exp(x))
-    return f_x
-
-def TopK(x, k):
-    a = dict([(i, j) for i, j in enumerate(x)])
-    sorted_a = dict(sorted(a.items(), key = lambda kv:kv[1], reverse=True))
-    indices = list(sorted_a.keys())[:k]
-    values = list(sorted_a.values())[:k]
-    #return (indices, values)
-    return indices
-
-def findFirstMask(model,sentence = "summary CallExpression ExpressionStatement BlockStatement FunctionDeclaration Program",topn = 5):
-    sentence = sentence.split()
-    correct = sentence[0]
-    sentence[0] = "[MASK]"
-    sentence = ' '.join(sentence)
+def findFirstMask(model,sentence,topn=5,echo=True):
+    #reference https://gist.github.com/yuchenlin/a2f42d3c4378ed7b83de65c7a2222eb2
     tokenizer = BertTokenizer.from_pretrained('./CodeTokenizer')
-    x = tokenizer(sentence)["input_ids"]
-    x = torch.tensor(x).unsqueeze(0)
-    output = model(x)
-    maskLogits = output[0][0][1]
-    npLogits = (maskLogits.detach().numpy())
-    top5 = TopK(npLogits,topn)
-    with open("./CodeTokenizer/vocab.txt","r") as f:
-        lines = f.readlines()
-    results = [lines[i].strip() for i in top5]
-    print("Correct output:",correct)
+
+    sentence = "[CLS] %s [SEP]"%sentence
+    tokenized_text = tokenizer.tokenize(sentence)
+    masked_index = tokenized_text.index("[MASK]")
+    indexed_tokens = tokenizer.convert_tokens_to_ids(tokenized_text)
+    tokens_tensor = torch.tensor([indexed_tokens])
+
+    with torch.no_grad():
+        outputs = model(tokens_tensor)
+        predictions = outputs[0]
+    probs = torch.nn.functional.softmax(predictions[0, masked_index], dim=-1)
+    top_k_weights, top_k_indices = torch.topk(probs, 50, sorted=True)
+
+    results = []
+    weights = []
+    for i, pred_idx in enumerate(top_k_indices):
+        predicted_token = tokenizer.convert_ids_to_tokens([pred_idx])[0]
+        token_weight = top_k_weights[i]
+        results.append(predicted_token)
+        weights.append(float(token_weight))
+
+    reList = []
     for i in range(len(results)):
-        print("Number " + str(i) + ": " + results[i])
-    return results
+        if(topn == 0):
+            break
+        word = results[i]
+        specials = ["[PAD]","[UNK]","[CLS]","[SEP]","[MASK]"]
+        if word not in specials and word[0] != '#' and len(word) != 1:
+            if(echo):
+                print("[MASK]: '%s'"%word, " | weights:", weights[i])
+            reList.append(word)
+            topn -= 1
+    return reList
+
+def validate(model,topn=5):
+    input = []
+    with open("Sentences.txt","r") as f:
+        input = f.read().split('\n')
+
+    total = len(input)
+    correctPrediction = 0
+    for s in input:
+        sl = s.split(' ')
+        correct = sl[0]
+        sl[0] = "[MASK]"
+        s = ' '.join(sl)
+        predictions = findFirstMask(model,s,topn=topn,echo=False)
+        if(correct in predictions):
+            correctPrediction += 1
+    return float(correctPrediction/total)
 
 def loadModel():
-    model = pickle.load(open("model.p"),"rb")
-    tokenizer = pickle.load(open("tokenizer.p"),"rb")
+    model = pickle.load(open("model.p","rb"))
+    tokenizer = pickle.load(open("tokenizer.p","rb"))
     return model, tokenizer
 
 def trainBertModel(data):
-    model = trainModel(data)
+    TrainTokenizer.compileTokenizer(data)
+    model = TrainModel.makeModel()
+    model = TrainModel.compileModel(model,data,MAX_LEN=512,epochCount=4)
     tokenizer = BertTokenizer.from_pretrained('./CodeTokenizer')
-    model = FineTuneModel.fineTune(model)
+    model = FineTuneModel.fineTune(model,MAX_LEN=512,epochCount=4)
     model.eval()
 
     pickle.dump(model,open("model.p","wb"))
@@ -72,18 +84,26 @@ def trainBertModel(data):
 
     return model
 
+def testBertModel():
+    model, tokenizer = loadModel()
+    model.eval()
+    # findFirstMask(model=model,topn=10,
+    #     sentence = "jit [MASK] ExpressionStatement BlockStatement FunctionDeclaration Program")
+    r = validate(model,topn=10)
+    print(r)
+
 def main():
     '''
     the data is a list of sequences
     a sequnce is a list of words (node name)
     right now it's loading from a saved datastructre, it would be parsed in in the future
     '''
-    data = pickle.load(open("data.p","rb"))
-    # for l in data:
-    #     print(l)
+    data = pickle.load(open("fullList.p","rb"))
+    #data = pickle.load(open("data.p","rb"))
+
     model = trainBertModel(data)
     os.system("clear")
-    findFirstMask(model)
+    #findFirstMask(model)
 
 if __name__ == '__main__':
-    main()
+    testBertModel()
