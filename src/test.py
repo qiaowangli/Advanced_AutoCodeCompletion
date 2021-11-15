@@ -2,13 +2,14 @@
 import storage_connection as sc
 import sequence_producer as seq_produce
 import traversal as tr
+import word_embedding as we
 import sys
 
 """
 Last edited by   : Shawn
 Last edited time : 14/11/2021
 Version Status: dev
-TO DO: Verify correctness
+TO DO: add the command for bert
 """
 
 if __name__ == "__main__":
@@ -44,3 +45,8 @@ if __name__ == "__main__":
         output_file.write('\n')
     output_file.close()
 
+    # embedding_table=we.word_embedding(tokenized_subSequence, tokenized_lookup_table)
+
+    """
+    The seq_table would be the input for bert.
+    """
