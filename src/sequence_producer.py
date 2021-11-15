@@ -7,7 +7,7 @@ import statistics
 
 """
 Last edited by   : Shawn
-Last edited time : 09/11/2021
+Last edited time : 15/11/2021
 Version Status: dev
 TO DO: Verify correctness
 """
@@ -184,14 +184,20 @@ def standardize_subsequence(tokenized_subsequence):
 
     # I need to add 0s to any sequence that is < 16 in length and cut off any sequence that is > than 16
     for sequence in tokenized_subsequence:
-        sequence=sequence[::-1] # reverse the list
+        sequence = sequence[::-1]  # reverse the list
+
         if len(sequence) == cutoff:
             standardized_subsequence.append(sequence)
-        if len(sequence) < cutoff:
+
+        elif len(sequence) < cutoff:
             # padd 0s to make it 16 in length
             while len(sequence) != cutoff:
                 sequence.append(0)
             standardized_subsequence.append(sequence)
+
+        else:  # len(sequence) > cutoff
+            # I need to ignore everything after the 16'th value
+            standardized_subsequence.append(sequence[:16])
 
     # # code below was used for understanding what cutoff point to choose
     # dist = {}
