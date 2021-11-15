@@ -3,7 +3,7 @@
 """
 Last edited by   : Shawn
 Last edited time : 09/11/2021
-Version Status: dev
+Version Status: stable
 TO DO: Verify correctness
 """
 
@@ -86,7 +86,7 @@ def ast2lcrs(ast):
 
 def sequenceSplit(in_order_list, lookup_table):
     """
-    @input : an entire ast list
+    @input : an entire ast list and lookup_table
     @output: sub_sequence table -> Key: training_id, Value: sub_sequence
     """
     subSequence_list = {}
@@ -158,3 +158,4 @@ def tokenization(sub_sequence_dict):
         lookup_table_dict[index] = [x, y]
 
     return tokenized_subsequence, lookup_table_dict
+

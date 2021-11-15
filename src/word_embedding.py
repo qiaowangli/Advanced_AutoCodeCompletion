@@ -5,7 +5,7 @@ from tensorflow.keras import layers
 """
 Last edited by   : Roy
 Last edited time : 10/11/2021
-Version Status: dev
+Version Status: stable
 TO DO: Skipgram implementaion with tf
 """
 

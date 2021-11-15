@@ -24,7 +24,7 @@ def storage_connection(credential_path):
         secret_key=login['console'][0]['secret_key'].replace(u'\xa0', u''),
     )
 
-    test_obj = client.get_object("RawDataStorage", "top100.json")
+    test_obj = client.get_object("RawDataStorage", "example.json")
     training_list = {}
     ast_index = 0
 
