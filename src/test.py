@@ -39,7 +39,7 @@ if __name__ == "__main__":
     standard_subsequence = seq_produce.standardize_subsequence(tokenized_subSequence)
 
     # Writing the input for our NN to a txt file so it can be used and avoid a 5min creation
-    output_file = open('NN_input.txt', 'w')
+    output_file = open('NN/NN_input.txt', 'w')
     for sequence in standard_subsequence:
         output_file.write(str(sequence))
         output_file.write('\n')
