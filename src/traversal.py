@@ -1,8 +1,8 @@
 #!/usr/bin/python3
 
 """
-Last edited by   : Braiden
-Last edited time : 09/11/2021
+Last edited by   : Roy
+Last edited time : 08/11/2021
 Version Status: stable
 TO DO: Verify correctness
 """
@@ -33,7 +33,7 @@ def in_order_traversal(root):
     node_list = []
     if root:
         node_list = in_order_traversal(root.child)  # Left tree
-        node_list.append(root.value)  # Root of tree
+        node_list.append(root.id)  # Root of tree
         node_list = node_list + in_order_traversal(root.next)  # Right tree
     return node_list
 
