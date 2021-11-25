@@ -6,7 +6,7 @@ import statistics
 
 """
 Last edited by   : Shawn
-Last edited time : 15/11/2021
+Last edited time : 25/11/2021
 Version Status: dev
 TO DO: Verify correctness
 """
@@ -98,20 +98,20 @@ def sequenceSplit(in_order_list, lookup_table):
     training_dataset_index = 0
     list = []
     for index in in_order_list:
-        if (lookup_table[index].child is None):
+        if lookup_table[index].child is None:
             list.append(lookup_table[index].value)
         else:
             list.append(lookup_table[index].type)
 
-        if (lookup_table[index].next != None):
+        if lookup_table[index].next is not None:
             # we need to get the parent nodes starting from the end of "in_order_list"
             number_of_parent = 1
             seeking_node = lookup_table[index]  # we use this seeking node to find out the number of parents we have.
-            while (seeking_node.parent.id != 0):
+            while seeking_node.parent.id != 0:
                 number_of_parent += 1
                 seeking_node = seeking_node.parent
             # now we extract the parents nodes 
-            while (-number_of_parent < 0):
+            while -number_of_parent < 0:
                 list.append(lookup_table[in_order_list[-number_of_parent]].type)
                 number_of_parent -= 1
 
