@@ -36,14 +36,14 @@ if __name__ == "__main__":
     # a = w2v.csv_to_df(file)
 
     # This takes care of step 2 that we discussed
-    standard_subsequence = seq_produce.standardize_subsequence(tokenized_subSequence)
+    # standard_subsequence = seq_produce.standardize_subsequence(tokenized_subSequence)
 
     # Writing the input for our NN to a txt file so it can be used and avoid a 5min creation
-    output_file = open('NN/NN_input.txt', 'w')
-    for sequence in standard_subsequence:
-        output_file.write(str(sequence))
-        output_file.write('\n')
-    output_file.close()
+    # output_file = open('NN/NN_input.txt', 'w')
+    # for sequence in standard_subsequence:
+    #     output_file.write(str(sequence))
+    #     output_file.write('\n')
+    # output_file.close()
 
     # embedding_table=we.word_embedding(tokenized_subSequence, tokenized_lookup_table)
 
