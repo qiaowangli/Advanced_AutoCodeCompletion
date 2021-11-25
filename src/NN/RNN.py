@@ -6,6 +6,8 @@ Last edited time : 14/11/2021
 Version Status: dev
 TO DO: 
 """
+
+
 def rnn(lookup_table, sequence):
     """
     @ input : lookup_table,sequence
