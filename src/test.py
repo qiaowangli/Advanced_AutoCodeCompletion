@@ -13,7 +13,7 @@ TO DO: add the command for bert
 """
 
 if __name__ == "__main__":
-    ast_data = sc.storage_connection(str(sys.argv[1]), "example.json")  # call storage_connection() to get the ast
+    ast_data = sc.storage_connection(str(sys.argv[1]), "top100.json")  # call storage_connection() to get the ast
 
     seq_table = {}  # key: id, value: sub_seq
     seq_table_index = 0
@@ -30,6 +30,7 @@ if __name__ == "__main__":
     To overcome this timing issue, we outputed the embedding_table to vector.csv that could be found in S3 storage, for further construction, checkout the RNN folder
     """
     tokenized_subSequence, tokenized_lookup_table = seq_produce.tokenization(seq_table)
+    # embedding_table = we.word_embedding(tokenized_subSequence, tokenized_lookup_table)
 
     # This takes care of step 1 that we discussed
     # file = ''  # Need to add the filepath for the requested CSV file
@@ -39,14 +40,8 @@ if __name__ == "__main__":
     standard_subsequence = seq_produce.standardize_subsequence(tokenized_subSequence)
 
     # Writing the input for our NN to a txt file so it can be used and avoid a 5min creation
-    output_file = open('NN_input.txt', 'w')
+    output_file = open('NN/NN_input.txt', 'w')
     for sequence in standard_subsequence:
         output_file.write(str(sequence))
         output_file.write('\n')
     output_file.close()
-
-    # embedding_table=we.word_embedding(tokenized_subSequence, tokenized_lookup_table)
-
-    """
-    The seq_table would be the input for bert.
-    """
