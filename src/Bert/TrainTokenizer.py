@@ -3,6 +3,7 @@ from tokenizers.processors import BertProcessing
 
 import numpy as np
 import os
+import pickle
 
 def makeSenteces(rawInput):
     with open("Sentences.txt","w") as f:
@@ -23,6 +24,7 @@ def cleanVocab(rawInput):
     for word in buffer:
         if word not in keepers:
             keepers.append(word)
+    pickle.dump(keepers,open("words.p","wb"))
     with open("./CodeTokenizer/vocab.txt",'r') as f:
         oldVocab = f.read().split("\n")
     finalVocab = oldVocab[:129] + keepers + oldVocab[129:]

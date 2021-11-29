@@ -21,7 +21,7 @@ class CodeDataSet(Dataset):
         val = {key: val[idx] for key, val in self.encodings.items()}
         return val
 
-def makeModel(hidden_size=300,num_hidden_layers=2,num_attention_heads=2,is_decoder=True,add_cross_attention=True):
+def makeModel(hidden_size=300,num_hidden_layers=6,num_attention_heads=4,is_decoder=True,add_cross_attention=True):
     #TODO: better bert config
     tokenizer = BertTokenizer.from_pretrained('./CodeTokenizer')
     config = BertConfig(tokenizer.vocab_size, hidden_size=hidden_size,

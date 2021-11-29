@@ -29,7 +29,7 @@ def storage_connection(credential_path,objectName = "example.json"):
     ast_index = 0
 
     for ast in test_obj:
-        training_list[ast_index] = json.loads(ast.decode('utf-8'))
+        training_list[ast_index] = json.loads(ast.decode('master'))
         ast_index += 1
 
     return training_list

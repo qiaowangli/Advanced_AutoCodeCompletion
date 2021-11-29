@@ -3,7 +3,7 @@ import TrainModel
 import FineTuneModel
 
 import pickle
-
+import sys
 import torch
 import os
 import numpy as np
@@ -12,7 +12,7 @@ import torch.nn.functional as F
 from transformers import BertTokenizer
 from transformers import RobertaTokenizer, RobertaForMaskedLM, pipeline
 
-def findFirstMask(model,sentence,topn=5,echo=True):
+def FindMsk(model,sentence,words,topn=5,echo=True):
     #reference https://gist.github.com/yuchenlin/a2f42d3c4378ed7b83de65c7a2222eb2
     tokenizer = BertTokenizer.from_pretrained('./CodeTokenizer')
 
@@ -41,15 +41,16 @@ def findFirstMask(model,sentence,topn=5,echo=True):
         if(topn == 0):
             break
         word = results[i]
-        specials = ["[PAD]","[UNK]","[CLS]","[SEP]","[MASK]"]
-        if word not in specials and word[0] != '#' and len(word) != 1:
+        #specials = ["[PAD]","[UNK]","[CLS]","[SEP]","[MASK]"]
+        #if word not in specials and word[0] != '#' and len(word) != 1:
+        if word in words:
             if(echo):
                 print("[MASK]: '%s'"%word, " | weights:", weights[i])
             reList.append(word)
             topn -= 1
     return reList
 
-def validate(model,topn=5):
+def validate(model,words,testIndex=0,topn=5):
     input = []
     with open("Sentences.txt","r") as f:
         input = f.read().split('\n')
@@ -58,10 +59,10 @@ def validate(model,topn=5):
     correctPrediction = 0
     for s in input:
         sl = s.split(' ')
-        correct = sl[0]
-        sl[0] = "[MASK]"
+        correct = sl[testIndex]
+        sl[testIndex] = "[MASK]"
         s = ' '.join(sl)
-        predictions = findFirstMask(model,s,topn=topn,echo=False)
+        predictions = FindMsk(model,s,words,topn=topn,echo=True)
         if(correct in predictions):
             correctPrediction += 1
     return float(correctPrediction/total)
@@ -74,9 +75,9 @@ def loadModel():
 def trainBertModel(data):
     TrainTokenizer.compileTokenizer(data)
     model = TrainModel.makeModel()
-    model = TrainModel.compileModel(model,data,MAX_LEN=512,epochCount=4)
+    model = TrainModel.compileModel(model,data,MAX_LEN=512,epochCount=16)
     tokenizer = BertTokenizer.from_pretrained('./CodeTokenizer')
-    model = FineTuneModel.fineTune(model,MAX_LEN=512,epochCount=4)
+    model = FineTuneModel.fineTune(model,MAX_LEN=512,epochCount=16)
     model.eval()
 
     pickle.dump(model,open("model.p","wb"))
@@ -87,9 +88,9 @@ def trainBertModel(data):
 def testBertModel():
     model, tokenizer = loadModel()
     model.eval()
-    # findFirstMask(model=model,topn=10,
-    #     sentence = "jit [MASK] ExpressionStatement BlockStatement FunctionDeclaration Program")
-    r = validate(model,topn=10)
+    words = pickle.load(open("words.p","rb"))
+    testIndex = 0
+    r = validate(model,words,testIndex,topn=10)
     print(r)
 
 def main():
@@ -99,11 +100,10 @@ def main():
     right now it's loading from a saved datastructre, it would be parsed in in the future
     '''
     data = pickle.load(open("fullList.p","rb"))
-    #data = pickle.load(open("data.p","rb"))
-
     model = trainBertModel(data)
-    os.system("clear")
-    #findFirstMask(model)
 
 if __name__ == '__main__':
-    testBertModel()
+    if(sys.argv[1] == "1"):
+        main()
+    if(sys.argv[1] == "2"):
+        testBertModel()
