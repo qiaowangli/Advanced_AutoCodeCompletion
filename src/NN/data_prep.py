@@ -98,7 +98,7 @@ def get_input_vectors_and_labels(seq_file_path, csv_file_path):
         # Replace the current integer with its corresponding vector in the word embedding table if > 0, else use vector of all 0's
         inputs.append([ list(word_embedding_df.loc[val -1]) if val > 0 else [0]*34 for val in seq[:-1]])
         # Store the last integer in each sequence as the label
-        labels.append(seq[-1])
+        labels.append([ list(word_embedding_df.loc[val -1]) if val > 0 else [0]*34 for val in seq[-1:]])
     
     # Convert the inputs and labels to numpy arrays
     inputs = np.array(inputs, dtype=float)
