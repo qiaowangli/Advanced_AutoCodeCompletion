@@ -10,7 +10,7 @@ TO DO: Determine LSTM parameters
 # from data_prep import get_input_vectors_and_labels
 
 from keras.models import Sequential
-from keras.layers import Dense, LSTM, Dropout
+from keras.layers import Dense, LSTM, Dropout, Masking
 from sklearn.model_selection import train_test_split
 
 def lstm(x,y):
@@ -27,27 +27,23 @@ def lstm(x,y):
     # Further separate the training data into training and validation data
     x_train, x_val, y_train, y_val = train_test_split(x_train, y_train, test_size=0.2, random_state=0)
 
-    # Model 1 - Inspired by: https://www.youtube.com/watch?v=iMIWee_PXl8
-    lstm1 = Sequential()
-    # Each feature vector is a vector with 15 elements where each element is a vector of length 34
-    lstm1.add(LSTM((1), batch_input_shape=(None, 15, 34), return_sequences=True))
-    lstm1.compile(loss='mean_absolute_error', optimizer='adam', metrics=['accuracy'])
 
-    history1 = lstm1.fit(x_train, y_train, epochs=10, validation_data=(x_val, y_val))
+    sequence_length = len(x_train[0])
+    sequence_element_length = len(x_train[0][0])
 
-    # Model 2 - Inspired by: https://stackoverflow.com/questions/40331510/how-to-stack-multiple-lstm-in-keras
-    lstm2 = Sequential()
-    lstm2.add(LSTM(32, return_sequences=True,
-                batch_input_shape=(None, 15, 34)))  # returns a sequence of vectors of dimension 32
-    lstm2.add(LSTM(32, return_sequences=True))  # returns a sequence of vectors of dimension 32
-    lstm2.add(LSTM(32))  # return a single vector of dimension 32
-    lstm2.add(Dense(10, activation='softmax'))
-    lstm2.compile(loss='mean_absolute_error', optimizer='adam', metrics=['accuracy'])
+    # Create an instance of the Sequential class
+    model = Sequential()
 
-    history2 = lstm2.fit(x_train, y_train, epochs=10, validation_data=(x_val, y_val))
+    model.add(Masking(mask_value= [0]*34, input_shape=(sequence_length, sequence_element_length) ))
+    model.add(LSTM(8000, activation="relu", input_shape=(sequence_length, sequence_element_length), return_sequences=True ))
+    model.add(Dense(7374, activation="softmax", input_shape=(sequence_length, sequence_element_length)))
 
+    model.compile(loss='mean_squared_error', optimizer='adam', metrics=['accuracy'])
 
-    return (history1, history2)
+    history = model.fit(x_train, y_train, epochs=10, validation_data=(x_val, y_val))
+    prediction = history.predict(x_test)
+    # return (history1, history2)
+    return (model, history, prediction)
 
 
 
