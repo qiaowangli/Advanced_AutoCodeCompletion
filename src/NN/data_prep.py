@@ -22,11 +22,8 @@ def get_input_vectors_and_labels(credential_path):
     labels = []
 
     # Get the word embedding table as a df
-    # word_embedding_df = get_word_embedding_table(csv_file_path, 0.9)
-    # This call can be replaced wih
     word_embedding_df = sc.storage_connection_embedding(credential_path, "pca_lookup_table.csv")
-    # sequence_list = get_seq_list(seq_file_path)
-    # This call can be replaced with
+    # Get the sequence list
     sequence_list = sc.storage_connection_sequence(credential_path, "NN_input.txt")
 
     for seq in sequence_list:
