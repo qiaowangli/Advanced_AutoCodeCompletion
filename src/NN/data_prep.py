@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-from src import storage_connection as sc
+import src.storage_connection as sc
 import numpy as np
 
 """
@@ -38,3 +38,5 @@ def get_input_vectors_and_labels(credential_path):
     labels = np.array(labels, dtype=float)
 
     return inputs, labels
+
+
