@@ -98,10 +98,18 @@ def get_input_vectors_and_labels(seq_file_path, csv_file_path):
         # Replace the current integer with its corresponding vector in the word embedding table if > 0, else use vector of all 0's
         inputs.append([ list(word_embedding_df.loc[val -1]) if val > 0 else [0]*34 for val in seq[:-1]])
         # Store the last integer in each sequence as the label
-        labels.append([ list(word_embedding_df.loc[val -1]) if val > 0 else [0]*34 for val in seq[-1:]])
+        # labels.append([ list(word_embedding_df.loc[val -1]) if val > 0 else [0]*34 for val in seq[-1:]])
+
+        # one-hot
+        labels.append([[1 if seq[-1] - 1 == i else 0 for i in range(7374)]])
     
     # Convert the inputs and labels to numpy arrays
     inputs = np.array(inputs, dtype=float)
     labels = np.array(labels, dtype=float)
+
+    # Convert the integers in the labels array to their one-hot representations
+    # Commented out because this method leads to vectors that are 1x7374
+    # labels = [int(val) for val in list(labels)]
+    # labels = np.eye(np.max(labels) + 1)[labels] 
 
     return (inputs, labels)
