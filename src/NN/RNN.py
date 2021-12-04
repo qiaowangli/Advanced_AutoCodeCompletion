@@ -1,8 +1,9 @@
 #!/usr/bin/python3
 from keras.models import Sequential
-from keras.layers import Dense, RNN, Dropout
+from keras.layers import SimpleRNN, Dense, Masking, Dropout
 from sklearn.model_selection import train_test_split
-
+import pandas as pd
+import numpy as np
 
 """
 Last edited by   : Shawn
@@ -26,23 +27,63 @@ def rnn(x, y):
     # Further separate the training data into training and validation data
     x_train, x_val, y_train, y_val = train_test_split(x_train, y_train, test_size=0.2, random_state=0)
 
-    # Model 1 - Inspired by: https://www.youtube.com/watch?v=iMIWee_PXl8
-    RNN1 = Sequential()
-    # Each feature vector is a vector with 15 elements where each element is a vector of length 34
-    RNN1.add(RNN(1, batch_input_shape=(None, 15, 34), return_sequences=True))
-    RNN1.compile(loss='mean_absolute_error', optimizer='adam', metrics=['accuracy'])
+    sequence_length = len(x_train[0])
+    sequence_element_length = len(x_train[0][0])
 
-    history1 = RNN1.fit(x_train, y_train, epochs=10, validation_data=(x_val, y_val))
+    # Create an instance of the Sequential class
+    model = Sequential()
 
-    # Model 2 - Inspired by: https://stackoverflow.com/questions/40331510/how-to-stack-multiple-lstm-in-keras
-    RNN2 = Sequential()
-    RNN2.add(RNN(32, return_sequences=True,
-                 batch_input_shape=(None, 15, 34)))  # returns a sequence of vectors of dimension 32
-    RNN2.add(RNN(32, return_sequences=True))  # returns a sequence of vectors of dimension 32
-    RNN2.add(RNN(32))  # return a single vector of dimension 32
-    RNN2.add(Dense(10, activation='softmax'))
-    RNN2.compile(loss='mean_absolute_error', optimizer='adam', metrics=['accuracy'])
+    model.add(Masking(mask_value=[0] * 34, input_shape=(sequence_length, sequence_element_length)))
+    model.add(SimpleRNN(10000, activation="relu", input_shape=(sequence_length, sequence_element_length),
+                        return_sequences=True))
+    model.add(Dropout(0.2))
+    model.add(SimpleRNN(10000, activation="relu", input_shape=(sequence_length, sequence_element_length),
+                        return_sequences=True))
+    model.add(Dropout(0.2))
+    model.add(SimpleRNN(10000, activation="relu", input_shape=(sequence_length, sequence_element_length),
+                        return_sequences=True))
+    model.add(Dropout(0.2))
+    model.add(Dense(7374, activation="softmax", input_shape=(sequence_length, sequence_element_length)))
 
-    history2 = RNN2.fit(x_train, y_train, epochs=10, validation_data=(x_val, y_val))
+    model.compile(loss='mean_squared_error', optimizer='adam', metrics=['accuracy'])
 
-    return history1, history2
+    history = model.fit(x_train, y_train, epochs=3, validation_data=(x_val, y_val))
+    prediction = history.predict(x_test)
+
+    return model, history, prediction
+
+
+def main():
+    inputs = []
+    labels = []
+
+    # Get the word embedding table as a df
+    word_embedding_df = pd.read_csv("pca_lookup_table.csv", header=None)
+
+    file = open("NN_input.txt")
+    sequence_list = []
+    for sequence in file:
+        sequence = [int(x) for x in sequence.strip().strip('][').split(',')]
+        sequence_list.append(sequence)
+    file.close()
+
+    for seq in sequence_list:
+        # Replace the current integer with its corresponding vector in the word embedding table if > 0,
+        # else use vector of all 0's
+        inputs.append([list(word_embedding_df.loc[val - 1]) if val > 0 else [0] * 34 for val in seq[:-1]])
+        # Store the last integer in each sequence as the label
+        # labels.append([list(word_embedding_df.loc[val - 1]) if val > 0 else [0] * 34 for val in seq[-1:]])
+        # one-hot
+        labels.append([[1 if seq[-1] - 1 == i else 0 for i in range(7374)]])
+
+    # Convert the inputs and labels to numpy arrays
+    inputs = np.array(inputs, dtype=float)
+    labels = np.array(labels, dtype=float)
+
+    model, history, predict = rnn(inputs, labels)
+
+
+    return
+
+
+main()

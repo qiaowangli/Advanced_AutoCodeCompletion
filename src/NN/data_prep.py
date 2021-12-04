@@ -1,10 +1,12 @@
 #!/usr/bin/python3
 from src import storage_connection as sc
+import pandas as pd
 import numpy as np
+from sklearn.decomposition import PCA
 
 """
-Last edited by   : Shawn
-Last edited time : 29/11/2021
+Last edited by   : Braiden
+Last edited time : 27/11/2021
 Version Status: dev
 TO DO:
 The functions in this file are for reading and preparing the inputs for the NN.
@@ -23,7 +25,7 @@ def get_input_vectors_and_labels(credential_path):
 
     # Get the word embedding table as a df
     word_embedding_df = sc.storage_connection_embedding(credential_path, "pca_lookup_table.csv")
-    # Get the sequence list
+
     sequence_list = sc.storage_connection_sequence(credential_path, "NN_input.txt")
 
     for seq in sequence_list:
@@ -38,3 +40,14 @@ def get_input_vectors_and_labels(credential_path):
     labels = np.array(labels, dtype=float)
 
     return inputs, labels
+
+
+def main():
+    credentials_path = '/Users/shawnnettleton/Documents/credentials_shawn.json'
+    inputs, labels = get_input_vectors_and_labels(credentials_path)
+    print(inputs.shape)
+    print(labels.shape)
+    return
+
+
+main()
