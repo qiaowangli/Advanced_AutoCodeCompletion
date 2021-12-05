@@ -30,19 +30,19 @@ def lstm(x,y):
     # Create an instance of the Sequential class
     model = Sequential()
     model.add(Masking(mask_value= [0]*34, input_shape=x_train.shape[1:]))
-    model.add(LSTM(2500, activation="relu", input_shape=x_train.shape[1:], return_sequences=True ))
+    model.add(LSTM(3000, activation="relu", input_shape=x_train.shape[1:], return_sequences=True ))
     model.add(Dropout(0.2))
-    model.add(LSTM(2500, activation="relu", input_shape=x_train.shape[1:], return_sequences=True ))
+    model.add(LSTM(3000, activation="relu", input_shape=x_train.shape[1:], return_sequences=True ))
     model.add(Dropout(0.2))
-    model.add(LSTM(2500, activation="relu", input_shape=x_train.shape[1:], return_sequences=True ))
+    model.add(LSTM(3000, activation="relu", input_shape=x_train.shape[1:], return_sequences=False ))
     model.add(Dropout(0.2))
     model.add(Dense(7374, activation="softmax", input_shape=x_train.shape[1:]))
 
     model.compile(loss='mean_squared_error', optimizer='adam', metrics=['accuracy'])
 
-    history = model.fit(x_train, y_train, epochs=3, validation_data=(x_val, y_val))
+    history = model.fit(x_train, y_train, epochs=4, validation_data=(x_val, y_val))
     prediction = history.predict(x_test)
-
+    # prediction should be 1x7374
 
     return (model, history, prediction)
 
