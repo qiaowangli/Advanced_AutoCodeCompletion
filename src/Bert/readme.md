@@ -6,7 +6,7 @@ This folder contains the training and evaluation function for BERT model
 pip3 install -r requirments.txt
 ```
 ## Usage:
-```python
+```bash
 python3 Bert.py
 ```
 ## Input:
