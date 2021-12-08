@@ -1,9 +1,13 @@
 #!/usr/bin/python3
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import statistics
 
 """
 Last edited by   : Shawn
-Last edited time : 09/11/2021
-Version Status: stable
+Last edited time : 25/11/2021
+Version Status: dev
 TO DO: Verify correctness
 """
 
@@ -29,7 +33,7 @@ def addSibling(parent_node, node, child_node):
         node = node.next
 
     node.next = child_node
-    node.next.parent=parent_node
+    node.next.parent = parent_node
     return node.next
 
 
@@ -69,12 +73,13 @@ def ast2lcrs(ast):
     for token_id in range(len(ast)):  # loop through a single AST
         if root is None:
             root = new_Node(ast[token_id])
-            lookup_table[token_id]=root
+            lookup_table[token_id] = root
             for child in ast[token_id]['children']:
                 lookup_table[child] = addChild(root, new_Node(ast[child]))
         else:
             # find out the location of node
-            starting_node = find_node(root, token_id)  # raise error if we cannot find the node. After we find it, we would append the child under this node
+            starting_node = find_node(root,
+                                      token_id)  # raise error if we cannot find the node. After we find it, we would append the child under this node
             if starting_node is not None:
                 try:
                     for child in ast[token_id]['children']:
@@ -86,33 +91,33 @@ def ast2lcrs(ast):
 
 def sequenceSplit(in_order_list, lookup_table):
     """
-    @input : an entire ast list and lookup_table
+    @input : an entire ast list
     @output: sub_sequence table -> Key: training_id, Value: sub_sequence
     """
     subSequence_list = {}
     training_dataset_index = 0
     list = []
     for index in in_order_list:
-        if(lookup_table[index].child is None):
+        if lookup_table[index].child is None:
             list.append(lookup_table[index].value)
         else:
             list.append(lookup_table[index].type)
 
-        if(lookup_table[index].next != None):
+        if lookup_table[index].next is not None:
             # we need to get the parent nodes starting from the end of "in_order_list"
             number_of_parent = 1
-            seeking_node = lookup_table[index] # we use this seeking node to find out the number of parents we have.
-            while(seeking_node.parent.id != 0):
+            seeking_node = lookup_table[index]  # we use this seeking node to find out the number of parents we have.
+            while seeking_node.parent.id != 0:
                 number_of_parent += 1
-                seeking_node=seeking_node.parent
+                seeking_node = seeking_node.parent
             # now we extract the parents nodes 
-            while(-number_of_parent < 0):
+            while -number_of_parent < 0:
                 list.append(lookup_table[in_order_list[-number_of_parent]].type)
                 number_of_parent -= 1
-            
-            subSequence_list[training_dataset_index]=list # terminate the list
-            training_dataset_index += 1 # add up the index number
-            list = [] # earse the whole list
+
+            subSequence_list[training_dataset_index] = list  # terminate the list
+            training_dataset_index += 1  # add up the index number
+            list = []  # earse the whole list
     return subSequence_list
 
 
@@ -158,3 +163,64 @@ def tokenization(sub_sequence_dict):
         lookup_table_dict[index] = [x, y]
 
     return tokenized_subsequence, lookup_table_dict
+
+
+def csv_to_df(file):
+    """
+    @input : csv file
+    @output: data frame containing the csv file
+    """
+    df = pd.read_csv(file)
+    return df
+
+
+def standardize_subsequence(tokenized_subsequence):
+    """
+    @input : tokenized sequence
+    @output: standardized tokenized sequence: Sequences that are uniform in length
+    """
+    standardized_subsequence = []
+    cutoff = 16  # this value was determined from analysis of our tokenized_subsequence
+
+    # I need to add 0s to any sequence that is < 16 in length
+    # I then need to cut off any initial data for sequences > than 16
+    for sequence in tokenized_subsequence:
+        if len(sequence) == cutoff:
+            sequence = sequence[::-1]  # reverse the list
+            standardized_subsequence.append(sequence)
+
+        elif len(sequence) < cutoff:
+            sequence = sequence[::-1]  # reverse the list
+            # padd 0s to the front of sequence to make it 16 in length
+            x = cutoff - len(sequence)  # determines how many 0s are required
+            padded_sequence = [0] * x  # create new list with that many 0s
+            for val in sequence:
+                padded_sequence.append(val)  # add original sequence after 0s
+            standardized_subsequence.append(padded_sequence)
+
+        else:  # len(sequence) > cutoff
+            # I need to only grab a subsequence of the original sequence of 16 back to front
+            sequence = sequence[:16]
+            sequence = sequence[::-1]  # reverse the list
+            standardized_subsequence.append(sequence)
+
+    # # code below was used for understanding what cutoff point to choose
+    # dist = {}
+    # for x in tokenized_subsequence:
+    #     seq_len = len(x)
+    #     dist[seq_len] = 0
+    #
+    # for x in tokenized_subsequence:
+    #     seq_len = len(x)
+    #     dist[seq_len] += 1
+    #
+    # plt.bar(dist.keys(), dist.values(), 1.0, color='g')
+    # plt.show()
+    #
+    # values = []
+    # for sequence in tokenized_subsequence:
+    #     values.append(len(sequence))
+    # median = statistics.median(values)
+    # print(median)
+
+    return standardized_subsequence
