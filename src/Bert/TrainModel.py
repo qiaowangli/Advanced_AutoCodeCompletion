@@ -23,7 +23,7 @@ class CodeDataSet(Dataset):
         val = {key: val[idx] for key, val in self.encodings.items()}
         return val
 
-def makeModel(modelConfig,tokenize):
+def makeModel(modelConfig,tokenizer):
     #TODO: better bert config
     print("Initializing Model")
     config = BertConfig(tokenizer.vocab_size,
@@ -108,7 +108,7 @@ def TrainWithData(model,loader,epochCount):
             loop.set_postfix(loss=loss.item())
     return model
 
-def compileModel(data,model,NSP_rate,MAX_LEN,maskingRate,batch_size,epochCount):
+def compileModel(data,NSP_rate,MAX_LEN,maskingRate,batch_size,epochCount,jsonData):
     tokenizer = BertTokenizer.from_pretrained('./CodeTokenizer')
     model = makeModel(jsonData,tokenizer)
     firstHalf,secondHalf,labels = makeNSPinput(data,NSP_rate)
@@ -138,10 +138,10 @@ def trainModel(data):
     with open('Variables.json') as f:
         jsonData = json.load(f)["BERT_model_config"]
 
-    model = compileModel(data,model
+    model = compileModel(data
                         ,jsonData["NSP_rate"],jsonData["MAX_LEN"]
                         ,jsonData["maskingRate"],jsonData["batch_size"]
-                        ,jsonData["epochCount"])
+                        ,jsonData["epochCount"],jsonData)
     model.eval()
     os.system("clear")
     return model
