@@ -7,6 +7,8 @@ from tqdm import tqdm
 import random
 import torch
 import pickle
+import json
+import os
 
 #Reference = https://towardsdatascience.com/how-to-train-bert-aaad00533168
 
@@ -21,27 +23,33 @@ class CodeDataSet(Dataset):
         val = {key: val[idx] for key, val in self.encodings.items()}
         return val
 
-def makeModel(hidden_size=300,num_hidden_layers=6,num_attention_heads=4,is_decoder=True,add_cross_attention=True):
+def makeModel(modelConfig,tokenize):
     #TODO: better bert config
-    tokenizer = BertTokenizer.from_pretrained('./CodeTokenizer')
-    config = BertConfig(tokenizer.vocab_size, hidden_size=hidden_size,
-                        num_hidden_layers=num_hidden_layers, num_attention_heads=num_attention_heads,
-                        is_decoder=is_decoder,add_cross_attention=add_cross_attention)
+    print("Initializing Model")
+    config = BertConfig(tokenizer.vocab_size,
+                        hidden_size = modelConfig["hidden_size"],
+                        num_hidden_layers = modelConfig["num_hidden_layers"],
+                        num_attention_heads=modelConfig["num_attention_heads"],
+                        is_decoder=modelConfig["is_decoder"],
+                        add_cross_attention=modelConfig["add_cross_attention"]
+                        )
     model = BertForPreTraining (config)
     return model
 
-def MakeNSPinput(data):
+def makeNSPinput(data,NSP_rate):
     '''
     Generate train data for NSP training
     input: data is the list sequences (while seq is a list of words)
     output: first and second setence pair with label 0 for true and 1 for false
     '''
+    print("Prepping NSP data")
     firstHalf = []
     secondHalf = []
     #0 -> a and b does connect 1 -> they don't
     labels = []
+    NSP_rate = 1 - NSP_rate
     for i in range(len(data)):
-        if(random.random() > 0.4):
+        if(random.random() > NSP_rate):
             #Correct split
             labels.append(0)
             splitPoint = random.randint(1,len(data[i])-1)
@@ -60,7 +68,8 @@ def MakeNSPinput(data):
     labels = torch.LongTensor([labels]).T
     return firstHalf,secondHalf,labels
 
-def MakeMLMMasking(inputs,maskingRate = 0.15):
+def MakeMLMMasking(inputs,maskingRate):
+    print("Prepping MLM data")
     rand = torch.rand(inputs.input_ids.shape)
     #Do not mask CLS, SEP, or PAD
     mask_arr = (rand < 0.15) * (inputs.input_ids != 2) * (inputs.input_ids != 3) * (inputs.input_ids != 0)
@@ -71,6 +80,7 @@ def MakeMLMMasking(inputs,maskingRate = 0.15):
     return inputs
 
 def TrainWithData(model,loader,epochCount):
+    print("Training model")
     device = torch.device("cpu")
     model.to(device)
     model.train()
@@ -98,11 +108,10 @@ def TrainWithData(model,loader,epochCount):
             loop.set_postfix(loss=loss.item())
     return model
 
-def compileModel(model,data,MAX_LEN = 512,maskingRate = 0.15,epochCount=16):
-    #data is the list sequences (while seq is a list of words)
-    firstHalf,secondHalf,labels = MakeNSPinput(data)
-
+def compileModel(data,model,NSP_rate,MAX_LEN,maskingRate,batch_size,epochCount):
     tokenizer = BertTokenizer.from_pretrained('./CodeTokenizer')
+    model = makeModel(jsonData,tokenizer)
+    firstHalf,secondHalf,labels = makeNSPinput(data,NSP_rate)
     inputs = tokenizer(firstHalf,secondHalf,return_tensors="pt",
                         max_length=MAX_LEN,truncation=True,padding="max_length")
     inputs["next_sentence_label"] = labels
@@ -111,15 +120,35 @@ def compileModel(model,data,MAX_LEN = 512,maskingRate = 0.15,epochCount=16):
     inputs = MakeMLMMasking(inputs,maskingRate)
     dataset = CodeDataSet(inputs)
 
-    loader = torch.utils.data.DataLoader(dataset, batch_size=16, shuffle=True)
+    loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True)
     #device = torch.device("cuba") if torch.cuba.is_available() else torch.device("cpu")
 
     model = TrainWithData(model,loader,epochCount)
     return model
 
+def trainModel(data):
+    print('''
+        ████████╗██████╗░░█████╗░██╗███╗░░██╗██╗███╗░░██╗░██████╗░  ███╗░░░███╗░█████╗░██████╗░███████╗██╗░░░░░
+        ╚══██╔══╝██╔══██╗██╔══██╗██║████╗░██║██║████╗░██║██╔════╝░  ████╗░████║██╔══██╗██╔══██╗██╔════╝██║░░░░░
+        ░░░██║░░░██████╔╝███████║██║██╔██╗██║██║██╔██╗██║██║░░██╗░  ██╔████╔██║██║░░██║██║░░██║█████╗░░██║░░░░░
+        ░░░██║░░░██╔══██╗██╔══██║██║██║╚████║██║██║╚████║██║░░╚██╗  ██║╚██╔╝██║██║░░██║██║░░██║██╔══╝░░██║░░░░░
+        ░░░██║░░░██║░░██║██║░░██║██║██║░╚███║██║██║░╚███║╚██████╔╝  ██║░╚═╝░██║╚█████╔╝██████╔╝███████╗███████╗
+        ░░░╚═╝░░░╚═╝░░╚═╝╚═╝░░╚═╝╚═╝╚═╝░░╚══╝╚═╝╚═╝░░╚══╝░╚═════╝░  ╚═╝░░░░░╚═╝░╚════╝░╚═════╝░╚══════╝╚══════╝
+    ''')
+    with open('Variables.json') as f:
+        jsonData = json.load(f)["BERT_model_config"]
+
+    model = compileModel(data,model
+                        ,jsonData["NSP_rate"],jsonData["MAX_LEN"]
+                        ,jsonData["maskingRate"],jsonData["batch_size"]
+                        ,jsonData["epochCount"])
+    model.eval()
+    os.system("clear")
+    return model
+
 def main():
     data = pickle.load(open("data.p","rb"))
-    compileModel(data)
+    trainModel(data)
 
 if __name__ == '__main__':
     main()

@@ -14,17 +14,21 @@ TO DO: add the command for bert
 """
 
 if __name__ == "__main__":
-    ast_data = sc.storage_connection(str(sys.argv[1]),objectName="new.json")  # call storage_connection() to get the ast
+    ast_data = sc.storage_connection(str(sys.argv[1]),object="top100.json")  # call storage_connection() to get the ast
 
     seq_table={} # key: id, value: sub_seq
     seq_table_index=0
     for ast_id in range(len(ast_data)):
-        root,lookup_table = seq_produce.ast2lcrs(ast_data[ast_id])  # call ast2lcrs() to convert the ast to lcrs
-        in_order_list = tr.in_order_traversal(root) # call in_order_traversal() to get the sequence.
-        subSequence_list=seq_produce.sequenceSplit(in_order_list,lookup_table)
-        for list in range(len(subSequence_list)):
-            seq_table[seq_table_index]=subSequence_list[list]
-            seq_table_index+=1
+        print(ast_id,'/',len(ast_data))
+        try:
+            root,lookup_table = seq_produce.ast2lcrs(ast_data[ast_id])  # call ast2lcrs() to convert the ast to lcrs
+            in_order_list = tr.in_order_traversal(root) # call in_order_traversal() to get the sequence.
+            subSequence_list=seq_produce.sequenceSplit(in_order_list,lookup_table)
+            for list in range(len(subSequence_list)):
+                seq_table[seq_table_index]=subSequence_list[list]
+                seq_table_index+=1
+        except:
+            pass
 
     """
     the following command would take 3-6 hours to produce the embedding_table for RNN/LSTM given the tokenized_subSequence and tokenized_lookup_table,
@@ -42,4 +46,4 @@ if __name__ == "__main__":
             data.append(i)
         else:
             print(i)
-    pickle.dump(data,open("fullList.p","wb"))
+    pickle.dump(data,open("top100.p","wb"))

@@ -85,7 +85,7 @@ def MakeNSPinput(data):
     labels = torch.LongTensor([labels]).T
     return firstHalf,secondHalf,labels
 
-def processDataloaders(data,tokenizer,MAX_LEN=15,sampleRate=0.1,maskRate=0.15):
+def processDataloaders(data,tokenizer,MAX_LEN,sampleRate,maskRate,batch_size):
     firstHalf,secondHalf,labels = MakeNSPinput(data)
 
     tokenized = tokenizer(firstHalf,secondHalf,return_tensors="pt",
@@ -204,20 +204,42 @@ def validaMode(model,loader,epochCount):
     print("Validation Accuracy: {}".format(eval_accuracy/nb_eval_steps))
     return model
 
-def fineTune(model,MAX_LEN=512,epochCount=16):
+def fineTune(model):
+    print('''
+
+        ███████╗██╗███╗░░██╗███████╗████████╗██╗░░░██╗███╗░░██╗██╗███╗░░██╗░██████╗░
+        ██╔════╝██║████╗░██║██╔════╝╚══██╔══╝██║░░░██║████╗░██║██║████╗░██║██╔════╝░
+        █████╗░░██║██╔██╗██║█████╗░░░░░██║░░░██║░░░██║██╔██╗██║██║██╔██╗██║██║░░██╗░
+        ██╔══╝░░██║██║╚████║██╔══╝░░░░░██║░░░██║░░░██║██║╚████║██║██║╚████║██║░░╚██╗
+        ██║░░░░░██║██║░╚███║███████╗░░░██║░░░╚██████╔╝██║░╚███║██║██║░╚███║╚██████╔╝
+        ╚═╝░░░░░╚═╝╚═╝░░╚══╝╚══════╝░░░╚═╝░░░░╚═════╝░╚═╝░░╚══╝╚═╝╚═╝░░╚══╝░╚═════╝░
+
+        ███╗░░░███╗░█████╗░██████╗░███████╗██╗░░░░░
+        ████╗░████║██╔══██╗██╔══██╗██╔════╝██║░░░░░
+        ██╔████╔██║██║░░██║██║░░██║█████╗░░██║░░░░░
+        ██║╚██╔╝██║██║░░██║██║░░██║██╔══╝░░██║░░░░░
+        ██║░╚═╝░██║╚█████╔╝██████╔╝███████╗███████╗
+        ╚═╝░░░░░╚═╝░╚════╝░╚═════╝░╚══════╝╚══════╝
+    ''')
+
+    with open('Variables.json') as f:
+      jsonData = json.load(f)["BERT_fine_tune_config"]
     with open("Sentences.txt","r") as f:
         data = f.read().split('\n')
     while '' in data:
         data.remove('')
     device = torch.device("cpu")
     tokenizer = BertTokenizer.from_pretrained('./CodeTokenizer')
-    train_dataloader,validation_dataloader = processDataloaders(data,tokenizer,MAX_LEN)
-    trainWithData(model,train_dataloader,epochCount)
-    validaMode(model,validation_dataloader,epochCount)
+    train_dataloader,validation_dataloader = processDataloaders(data,tokenizer,jsonData["MAX_LEN"],
+                                jsonData["sampleRate"],jsonData["maskingRate"],jsonData["batch_size"])
+    trainWithData(model,train_dataloader,jsonData["epochCount"])
+    validaMode(model,validation_dataloader,jsonData["epochCount"])
+    os.system("clear")
     return model
 
 def main():
-    train()
+    model = pickle.load(open("model.p","rb"))
+    fineTune(model)
 
 if __name__ == '__main__':
     main()
