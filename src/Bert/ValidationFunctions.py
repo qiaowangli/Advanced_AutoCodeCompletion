@@ -1,6 +1,9 @@
 from transformers import BertTokenizer
 import torch
 import os
+from alive_progress import alive_bar
+
+result = -1
 
 def FindMsk(model,tokenizer,sentence,words,topn=5,echo=True):
     #reference https://gist.github.com/yuchenlin/a2f42d3c4378ed7b83de65c7a2222eb2
@@ -38,16 +41,13 @@ def FindMsk(model,tokenizer,sentence,words,topn=5,echo=True):
         print()
     return reList
 
-def validate(model,tokenizer,testIndex,topn,echo):
-    input = []
-    with open("Sentences.txt","r") as f:
-        input = f.read().split('\n')
+def validate(model,tokenizer,testIndex,topn,echo,data):
     with open("words.txt",'r') as f:
         words = f.read().split('\n')
 
-    total = len(input)
+    total = len(data)
     correctPrediction = 0
-    for s in input:
+    for s in data:
         sl = s.split(' ')
         correct = sl[testIndex]
         sl[testIndex] = "[MASK]"
@@ -55,7 +55,9 @@ def validate(model,tokenizer,testIndex,topn,echo):
         predictions = FindMsk(model,tokenizer,s,words,topn,echo)
         if(correct in predictions):
             correctPrediction += 1
-    return float(correctPrediction/total) * 100
+        yield
+    global result
+    result = float(correctPrediction/total) * 100
 
 
 def validateBertModel(model,tokenizer):
@@ -68,6 +70,13 @@ def validateBertModel(model,tokenizer):
         ██████╦╝███████╗██║░░██║░░░██║░░░  ███████╗░░╚██╔╝░░██║░░██║███████╗╚██████╔╝██║░░██║░░░██║░░░██║╚█████╔╝██║░╚███║
         ╚═════╝░╚══════╝╚═╝░░╚═╝░░░╚═╝░░░  ╚══════╝░░░╚═╝░░░╚═╝░░╚═╝╚══════╝░╚═════╝░╚═╝░░╚═╝░░░╚═╝░░░╚═╝░╚════╝░╚═╝░░╚══╝
     ''')
+    fileName = input("Input the name of the test file (default Sentences.txt): ")
+    if(fileName == ''):
+        fileName = "Sentences.txt"
+    data = []
+    with open(fileName,"r") as f:
+        data = f.read().split('\n')
+
     testIndex = input("Input the index of the masked word (default 0): ")
     try:
         testIndex = int(testIndex)
@@ -83,4 +92,8 @@ def validateBertModel(model,tokenizer):
     echo = input("Print output? (y/n) (default n): ")
     echo = True if echo == 'y' else False
 
-    return validate(model,tokenizer,testIndex,topn,echo)
+    with alive_bar(len(data)) as bar:
+        for i in validate(model,tokenizer,testIndex,topn,echo,data):
+            bar()
+    global result
+    return result

@@ -18,11 +18,7 @@ def loadModel():
     tokenizer = pickle.load(open("tokenizer.p","rb"))
     return model, tokenizer
 
-def trainBertModel():
-    defaultFile = "data.p"
-    fileName = input("Input sequnce file name (default "+ defaultFile +"): ")
-    if(fileName == ''):
-        fileName = defaultFile
+def trainBertModel(fileName):
     data = pickle.load(open(fileName,"rb"))
 
     TrainTokenizer.compileTokenizer(data)
@@ -54,12 +50,21 @@ def main():
     ''')
     print("1) Train model")
     print("2) Evaluate model")
+    print("3) Quit")
     choice = input("Enter your mode: ")
-    os.system("clear")
     if(choice == "1"):
-        trainBertModel()
+        defaultFile = "data.p"
+        fileName = input("Input sequnce file name (default "+ defaultFile +"): ")
+        if(fileName == ''):
+            fileName = defaultFile
+            os.system("clear")
+        trainBertModel(fileName)
     elif(choice == "2"):
+        os.system("clear")
         validateBertModel()
+    elif(choice == "3"):
+        exit(0)
+
     else:
         print("Error command")
 
