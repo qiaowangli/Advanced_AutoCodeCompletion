@@ -6,10 +6,10 @@ import traversal as tr
 import sys
 
 """
-Last edited by   : Shawn
-Last edited time : 15/11/2021
+Last edited by   : Roy
+Last edited time : 08/12/2021
 Version Status: dev
-TO DO: add the command for bert
+TO DO:
 """
 
 if __name__ == "__main__":
