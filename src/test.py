@@ -32,6 +32,18 @@ if __name__ == "__main__":
     the following command would take 3-6 hours to produce the embedding_table for RNN/LSTM given the tokenized_subSequence and tokenized_lookup_table,
     To overcome this timing issue, we outputed the embedding_table to vector.csv that could be found in S3 storage, for further construction, checkout the RNN folder
     """
+
+    #BERT input
+    #import pickle
+    #data = []
+    #for i in seq_table.values():
+    #    if(None not in i):
+    #        data.append(i)
+    #    else:
+    #        print(i)
+    #pickle.dump(data,open("top100.p","wb"))
+    #exit(0)
+
     tokenized_subSequence, tokenized_lookup_table = seq_produce.tokenization(seq_table)
     # embedding_table = we.word_embedding(tokenized_subSequence, tokenized_lookup_table)
 

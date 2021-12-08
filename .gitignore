@@ -1,0 +1,4 @@
+credential.json
+*.pyc
+__pycache__
+top100.p

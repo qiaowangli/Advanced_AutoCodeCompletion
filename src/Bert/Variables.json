@@ -1,0 +1,25 @@
+{
+    "BERT_model_config" :
+      {
+        "hidden_size" : 300,
+        "num_hidden_layers" : 6,
+        "num_attention_heads" : 4,
+        "is_decoder" : true,
+        "add_cross_attention" : true,
+        "MAX_LEN" : 512,
+        "maskingRate" : 0.15,
+        "epochCount" : 4,
+        "NSP_rate" : 0.6,
+        "batch_size" : 16,
+        "epochCount" : 4
+      },
+
+    "BERT_fine_tune_config":
+      {
+        "epochCount" : 4,
+        "MAX_LEN" : 512,
+        "sampleRate" : 0.1,
+        "maskingRate" : 0.15,
+        "batch_size" : 16
+      }
+}

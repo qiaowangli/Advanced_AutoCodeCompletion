@@ -1,0 +1,28 @@
+regress-472450-04.js VariableDeclarator VariableDeclaration Program
+472450 VariableDeclarator VariableDeclaration Program
+TM: Do not assert: StackBase(fp) + blockDepth == regs.sp VariableDeclarator VariableDeclaration Program
+ VariableDeclarator VariableDeclaration Program
+ VariableDeclarator VariableDeclaration Program
+test CallExpression ExpressionStatement Program
+test FunctionDeclaration Program
+enterFunc CallExpression ExpressionStatement BlockStatement FunctionDeclaration Program
+test CallExpression ExpressionStatement BlockStatement FunctionDeclaration Program
+printBugNumber CallExpression ExpressionStatement BlockStatement FunctionDeclaration Program
+BUGNUMBER CallExpression ExpressionStatement BlockStatement FunctionDeclaration Program
+printStatus CallExpression ExpressionStatement BlockStatement FunctionDeclaration Program
+summary CallExpression ExpressionStatement BlockStatement FunctionDeclaration Program
+jit CallExpression ExpressionStatement BlockStatement FunctionDeclaration Program
+true CallExpression ExpressionStatement BlockStatement FunctionDeclaration Program
+✖ Identifier LiteralString CallExpression ExpressionStatement BlockStatement FunctionDeclaration Program
+1 ArrayExpression AssignmentExpression Property ObjectExpression ExpressionStatement BlockStatement FunctionDeclaration Program
+f ExpressionStatement BlockStatement FunctionDeclaration Program
+eval Identifier LiteralString CallExpression ExpressionStatement BlockStatement FunctionDeclaration Program
+for (var y = 0; y < 1; ++y) { for each (let z in [null, function(){}, null, '', null, '', null]) { let x = 1, c = []; } } CallExpression ExpressionStatement BlockStatement FunctionDeclaration BlockStatement FunctionDeclaration Program
+f CallExpression ExpressionStatement BlockStatement FunctionDeclaration Program
+jit CallExpression ExpressionStatement BlockStatement FunctionDeclaration Program
+false CallExpression ExpressionStatement BlockStatement FunctionDeclaration Program
+reportCompare CallExpression ExpressionStatement BlockStatement FunctionDeclaration Program
+expect CallExpression ExpressionStatement BlockStatement FunctionDeclaration Program
+actual CallExpression ExpressionStatement BlockStatement FunctionDeclaration Program
+summary CallExpression ExpressionStatement BlockStatement FunctionDeclaration Program
+exitFunc CallExpression ExpressionStatement BlockStatement FunctionDeclaration Program

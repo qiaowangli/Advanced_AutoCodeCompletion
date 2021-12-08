@@ -1,0 +1,22 @@
+regress-472450-04.js
+472450
+TM: Do not assert: StackBase(fp) + blockDepth == regs.sp
+
+test
+enterFunc
+printBugNumber
+BUGNUMBER
+printStatus
+summary
+jit
+true
+✖
+1
+f
+eval
+for (var y = 0; y < 1; ++y) { for each (let z in [null, function(){}, null, '', null, '', null]) { let x = 1, c = []; } }
+false
+reportCompare
+expect
+actual
+exitFunc
