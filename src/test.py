@@ -34,15 +34,15 @@ if __name__ == "__main__":
     """
 
     #BERT input
-    import pickle
-    data = []
-    for i in seq_table.values():
-        if(None not in i):
-            data.append(i)
-        else:
-            print(i)
-    pickle.dump(data,open("top100.p","wb"))
-    exit(0)
+    #import pickle
+    #data = []
+    #for i in seq_table.values():
+    #    if(None not in i):
+    #        data.append(i)
+    #    else:
+    #        print(i)
+    #pickle.dump(data,open("top100.p","wb"))
+    #exit(0)
 
     tokenized_subSequence, tokenized_lookup_table = seq_produce.tokenization(seq_table)
     # embedding_table = we.word_embedding(tokenized_subSequence, tokenized_lookup_table)
