@@ -57,7 +57,7 @@ def main():
         fileName = input("Input sequnce file name (default "+ defaultFile +"): ")
         if(fileName == ''):
             fileName = defaultFile
-            os.system("clear")
+        os.system("clear")
         trainBertModel(fileName)
     elif(choice == "2"):
         os.system("clear")

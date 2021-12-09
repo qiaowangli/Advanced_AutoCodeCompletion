@@ -3,6 +3,8 @@ from transformers import BertTokenizer
 from transformers import AdamW
 from torch.utils.data import Dataset
 from tqdm import tqdm
+from alive_progress import alive_bar
+
 
 import random
 import torch
@@ -25,7 +27,6 @@ class CodeDataSet(Dataset):
 
 def makeModel(modelConfig,tokenizer):
     #TODO: better bert config
-    print("Initializing Model")
     config = BertConfig(tokenizer.vocab_size,
                         hidden_size = modelConfig["hidden_size"],
                         num_hidden_layers = modelConfig["num_hidden_layers"],
@@ -36,13 +37,14 @@ def makeModel(modelConfig,tokenizer):
     model = BertForPreTraining (config)
     return model
 
+resultBuffer = None
+
 def makeNSPinput(data,NSP_rate):
     '''
     Generate train data for NSP training
     input: data is the list sequences (while seq is a list of words)
     output: first and second setence pair with label 0 for true and 1 for false
     '''
-    print("Prepping NSP data")
     firstHalf = []
     secondHalf = []
     #0 -> a and b does connect 1 -> they don't
@@ -65,11 +67,12 @@ def makeNSPinput(data,NSP_rate):
             firstHalf.append(' '.join(data[i][:splitPoint]))
             splitPoint = random.randint(1,len(data[otherList])-1)
             secondHalf.append(' '.join(data[otherList][splitPoint:]))
+        yield
     labels = torch.LongTensor([labels]).T
-    return firstHalf,secondHalf,labels
+    global resultBuffer
+    resultBuffer = firstHalf,secondHalf,labels
 
 def MakeMLMMasking(inputs,maskingRate):
-    print("Prepping MLM data")
     rand = torch.rand(inputs.input_ids.shape)
     #Do not mask CLS, SEP, or PAD
     mask_arr = (rand < 0.15) * (inputs.input_ids != 2) * (inputs.input_ids != 3) * (inputs.input_ids != 0)
@@ -77,7 +80,9 @@ def MakeMLMMasking(inputs,maskingRate):
         selection = torch.flatten(mask_arr[i].nonzero()).tolist()
         #MASK id
         inputs.input_ids[i,selection] = 5
-    return inputs
+        yield
+    global resultBuffer
+    resultBuffer = inputs
 
 def TrainWithData(model,loader,epochCount):
     print("Training model")
@@ -110,14 +115,30 @@ def TrainWithData(model,loader,epochCount):
 
 def compileModel(data,NSP_rate,MAX_LEN,maskingRate,batch_size,epochCount,jsonData):
     tokenizer = BertTokenizer.from_pretrained('./CodeTokenizer')
+    print("Initializing Model")
     model = makeModel(jsonData,tokenizer)
-    firstHalf,secondHalf,labels = makeNSPinput(data,NSP_rate)
+    print()
+
+    print("Prepping NSP data")
+    global resultBuffer
+    with alive_bar(len(data)) as bar:
+        for i in makeNSPinput(data,NSP_rate):
+            bar()
+    firstHalf,secondHalf,labels = resultBuffer
+    print()
+
     inputs = tokenizer(firstHalf,secondHalf,return_tensors="pt",
                         max_length=MAX_LEN,truncation=True,padding="max_length")
     inputs["next_sentence_label"] = labels
     inputs["labels"] = inputs.input_ids.detach().clone()
 
-    inputs = MakeMLMMasking(inputs,maskingRate)
+    print("Prepping MLM data")
+    with alive_bar(inputs.input_ids.shape[0]) as bar:
+        for i in MakeMLMMasking(inputs,maskingRate):
+            bar()
+    inputs = resultBuffer
+    print()
+
     dataset = CodeDataSet(inputs)
 
     loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True)
